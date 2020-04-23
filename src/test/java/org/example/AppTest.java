@@ -25,7 +25,7 @@ public class AppTest
 
     @Before
     public void setUp() {
-        System.setProperty("webdriver.chrome.driver","C:\\webdrivers\\chromedriver.exe");
+        System.setProperty("webdriver.chrome.driver","C:\\Users\\cahit.evmek\\Desktop\\HepsiBuradaCases\\Driver\\chromedriver.exe");
         DesiredCapabilities capabilities = DesiredCapabilities.chrome();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("test-type");
