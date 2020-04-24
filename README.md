@@ -22,6 +22,15 @@ https://help.github.com/en/desktop/contributing-to-projects/cloning-a-repository
 
 Yada gitHub linki ile direk kurulum yapabilirsiniz.
 
+ÖNENLİ NOT: Kurulum yapıldıktan sonra her 2 test case içindeki chromedriver lokasyon bilgileri mevcut makinadaki chromedriver path ile güncellenmelidir.
+
+```bash
+System.setProperty("webdriver.chrome.driver","C:\\Users\\cahit.evmek\\Desktop\\HepsiBuradaCases\\Driver\\chromedriver.exe");
+```
+
+```bash
+capabilities.setCapability("chrome.binary","C:\\Users\\cahit.evmek\\Desktop\\SelleniumProject\\src\\library\\drivers\\chromedriver.exe");
+```
 
 ### Programlama Hakkında Notlar
 
