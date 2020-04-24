@@ -15,15 +15,11 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
 
-/**
- * Unit test for simple App.
- */
-public class AppTest
+public class HepsiBuradaCase1
 {
     private WebDriver driver = null;
     private JavascriptExecutor js = null;
     private String baseUrl = "https://www.hepsiburada.com/";
-    //private String baseUrl = "https://www.n11.com/";
     private WebDriverWait wait = null;
     private String productName = null;
     private String shippingPrice = null;
@@ -75,80 +71,52 @@ public class AppTest
         Thread.sleep(2000);
         clickByXpath("//*[@id=\"SearchBoxOld\"]/div/div/div[1]/div[2]/div/input");
         writeByXpath("//*[@id=\"SearchBoxOld\"]/div/div/div[1]/div[2]/div/input","lego");
-        //clickByXpath("//*[@id=\"SearchBoxOld\"]/div/div/div[2]");
         clickByClassName("SearchBoxOld-buttonContainer");
 
         //75 tl altı ürün listelenmesi
         Thread.sleep(5000);
         clickByXpath("//div[@class='range-contain-row left']/input[@class='input free' and @placeholder = 'En çok']");
-        writeByXpath("//div[@class='range-contain-row left']/input[@class='input free' and @placeholder = 'En çok']","75");
+        writeByXpath("//div[@class='range-contain-row left']/input[@class='input free' and @placeholder = 'En çok']","74");
         clickByXpath("//div[@class='range-contain-row right']/button[@class='button small']");
 
         //sepete ürün ekleme ve eklenmiş ürünün adının alınması
         Thread.sleep(10000);
-     /*   WebElement addBasket = driver.findElement(By.xpath("//button[@class='add-to-basket button small']"));
-        productName = addBasket.getAttribute("data-product");
-        productName = productName.substring(productName.lastIndexOf("productName\":\"") + 14,productName.indexOf("\",\"categoryId"));
-        System.out.println(productName);
-     */
         js.executeScript("window.scrollBy(0,500)");
-        productName = getTextFromAttributeByXpath("//button[@class='add-to-basket button small']","data-product","productName\":\"", "\",\"categoryId");
-
+        productName = getTextFromAttributeByXpath("//button[@class='add-to-basket button small']","data-product",0,"productName\":\"", "\",\"categoryId");
         clickByXpath("//button[@class='add-to-basket button small']",0);
         Thread.sleep(5000);
 
-        //sepetim açma
+        //Seçilen ürünün doğru olarak eklendiği ‘Sepetim’ sayfasında doğrulanması
         clickByXpath("//span[@id='shoppingCart']");
-
         Thread.sleep(5000);
-
-        //sepete eklenen ürünün kontrolü
         textControlByXpath("//h4[@class='product-name']/*[contains(@class,'hbus')]", productName);
 
-        //Kargo ücreti alınma kontrolü
+        //Sepete eklenen ürünün kargo bedava olmadığı doğrulanması
         textNotEquelControlByXpath("//div[@class='price']/strong[@data-bind='text: shippingPrice']","0,00");
 
+        //Sepete ne kadarlık ürün eklenirse kargo bedava olacağı bilgisi doğrulanması
         cartItemPrice = driver.findElement(By.xpath("//div[@class='price']/strong[@data-bind='text: cartItemPrice']")).getText();
-        cartItemPrice = shippingPrice.replace(",",".");
-        System.out.println(cartItemPrice);
+        cartItemPrice = cartItemPrice.replace(",",".");
 
         missingPrice = driver.findElement(By.xpath("//p[@data-bind='html: umbrellaCampaignText']")).getText();
         missingPrice = missingPrice.substring(missingPrice.indexOf("Sepetinize ") + 11, missingPrice.indexOf(" TL'lik"));
-        System.out.println(missingPrice);
+        Assert.assertEquals(75.00 - Double.parseDouble(cartItemPrice), Double.parseDouble(missingPrice), Math.abs(75.00 - Double.parseDouble(cartItemPrice) - Double.parseDouble(missingPrice)));
 
-        Assert.assertEquals(75 - Double.parseDouble(cartItemPrice), Double.parseDouble(missingPrice));
-
-
-        clickByXpath("//*[contains(@class,'btn-delete')]");
-
+        //sepetteki ürünü silme
+        for(int i = 0; i< driver.findElements(By.xpath("//*[contains(@class,'btn-delete')]")).size(); i++)
+        {
+            clickByXpath("//*[contains(@class,'btn-delete')]",i);
+            Thread.sleep(5000);
+        }
     }
 
     @After
     public void after() {
-        //      driver.quit();
+
+        driver.quit();
     }
 
-    public List<WebElement> findElements(String Xpath) throws InterruptedException {
-
-        List<WebElement> elements = driver.findElements(By.xpath(Xpath));
-
-        System.out.println(elements.size());
-
-        for (int i=0; i<elements.size();i++){
-            System.out.println("ücretler " + i + ": " + elements.get(i).getText());
-
-        }
-        Thread.sleep(500);
-
-        return elements;
-    }
-
-    public void waitForXpath (String Xpath) throws InterruptedException {
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(Xpath)));
-        Thread.sleep(500);
-    }
-
+    //Xpath parçası ile click işlemi
     public void clickByXpath(String Xpath) throws InterruptedException {
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(Xpath)));
@@ -157,14 +125,14 @@ public class AppTest
         driver.findElement(By.xpath(Xpath)).click();
     }
 
-    public void clickByXpath(String Xpath, int i) throws InterruptedException {
+    //Xpath parçası webelements listesi içindeki belirlenmiş element değerine click işlemi
+    public void clickByXpath(String Xpath, int indexNo) throws InterruptedException {
 
-        //wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(Xpath)));
-        //wait.until(ExpectedConditions.elementToBeClickable(By.xpath(Xpath)));
         Thread.sleep(500);
-        driver.findElements(By.xpath(Xpath)).get(i).click();
+        driver.findElements(By.xpath(Xpath)).get(indexNo).click();
     }
 
+    //classname ile click işlemi
     public void clickByClassName(String ClassName) throws InterruptedException {
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(ClassName)));
@@ -173,6 +141,7 @@ public class AppTest
         driver.findElement(By.className(ClassName)).click();
     }
 
+    //xpath parçası ile değer girişi
     public void writeByXpath(String Xpath, String text) throws InterruptedException {
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(Xpath)));
@@ -182,6 +151,7 @@ public class AppTest
         driver.findElement(By.xpath(Xpath)).sendKeys(new CharSequence[]{Keys.TAB});
     }
 
+    //cllasname ile değer girişi
     public void writeByClassName(String ClassName, String text) throws InterruptedException {
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(ClassName)));
@@ -191,6 +161,7 @@ public class AppTest
         driver.findElement(By.xpath(ClassName)).sendKeys(new CharSequence[]{Keys.TAB});
     }
 
+    //bir xpath parçası ile bulunan ekrandaki string değerinin, beklenen string değer ile eşit olma kontrolü
     private void textControlByXpath(String Xpath, String text) throws InterruptedException{
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(Xpath)));
@@ -199,6 +170,7 @@ public class AppTest
         Assert.assertEquals(driver.findElement(By.xpath(Xpath)).getText(), text);
     }
 
+    //bir xpath parçası ile bulunan ekrandaki string değerinin, beklenen string değer ile eşit olmama kontrolü
     private void textNotEquelControlByXpath(String Xpath, String text) throws InterruptedException{
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(Xpath)));
@@ -207,11 +179,12 @@ public class AppTest
         Assert.assertNotEquals(driver.findElement(By.xpath(Xpath)).getText(), text);
     }
 
-    private String getTextFromAttributeByXpath(String Xpath, String attribute, String firstPartString, String lastPartString) throws InterruptedException{
+    //webelements içindeki belirlenmiş bir değere ait attirbute değerleri içinden bir değerin string formatında alınması
+    private String getTextFromAttributeByXpath(String Xpath, String attribute, int indexNo, String firstPartString, String lastPartString) throws InterruptedException{
 
         //wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(Xpath)));
         Thread.sleep(500);
-        String s = driver.findElements(By.xpath(Xpath)).get(0).getAttribute(attribute);
+        String s = driver.findElements(By.xpath(Xpath)).get(indexNo).getAttribute(attribute);
         s = s.substring(s.indexOf(firstPartString) + firstPartString.length(),s.indexOf(lastPartString));
         System.out.println(s);
         return s;
